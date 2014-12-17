@@ -134,7 +134,7 @@ module.exports = (robot) ->
     output
 
   onlyNegative = (list) ->
-    _.filter(list || [], (x) -> (x.score_average < 0))
+    _.filter(list || [], (x) -> (x.score_average <= 0))
 
   onlyPositive = (list) ->
     _.filter(list || [], (x) -> (x.score_average > 0))
