@@ -98,21 +98,6 @@ Hubot is able to load scripts from third-party `npm` package. Check the package'
 
 You can review `external-scripts.json` to see what is included by default.
 
-##  Persistence
-
-If you are going to use the `hubot-redis-brain` package
-(strongly suggested), you will need to add the Redis to Go addon on Heroku which requires a verified
-account or you can create an account at [Redis to Go][redistogo] and manually
-set the `REDISTOGO_URL` variable.
-
-    % heroku config:add REDISTOGO_URL="..."
-
-If you don't require any persistence feel free to remove the
-`hubot-redis-brain` from `external-scripts.json` and you don't need to worry
-about redis at all.
-
-[redistogo]: https://redistogo.com/
-
 ## Adapters
 
 Adapters are the interface to the service you want your hubot to run on. This
@@ -154,6 +139,10 @@ This is a modified set of instructions based on the [instructions on the Hubot w
 
         % heroku config:add HUBOT_SLACK_TOKEN=xoxb-1234-5678-91011-00e4dd
         % heroku config:add HEROKU_URL=http://my-company-slackbot.herokuapp.com
+
+- Add a datastore (this step may fail if you don't have a verified Heroku account); without this, you will lose all data on each code push
+
+        % heroku addons:add redistogo:nano
 
 - Deploy and start the bot:
 
