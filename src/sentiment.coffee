@@ -5,27 +5,27 @@
 #   sentiment - lists sentiment stats (message contents NOT stored)
 #   who's happy?
 #   who's stressed?
-#   where's the happiness?
-#   where's the stress?
+#   where's happiness?
+#   where's stress?
 #
 # Author:
 #   Michi Kono
 #   Will Barksdale
 #
-# Configuration:
-#   HUBOT_SENTIMENT_BRAIN_INIT_TIMEOUT=N - wait for N milliseconds for brain data to load from redis. (default 10000)
 # Notes:
 #   Requires underscore and sentiment NPM modules
 #
 #   Tracks scores by current month. Collects sentiment on users [sentiment:week_digit:user] and
 #   channels [sentiment:week_digit:channel] in format:
 #
-#    [{
-#      name: user_or_channe_name
-#      year: 'YYYY',
-#      score_average: 0,
-#      score_count: 0
-#    }]
+#     {
+#       data: [{
+#         name: user_or_channe_name
+#         year: 'YYYY',
+#         score_average: 0,
+#         score_count: 0
+#       }]
+#     }
 #
 # Example:
 #   [sentiment:12:user:michi] = {n:a:yyyy} where n is the number of records, and a is the average score of the n records
@@ -33,9 +33,8 @@
 #
 sentiment = require 'sentiment'
 _ = require 'underscore'
-INIT_TIMEOUT = (if process.env.HUBOT_REACT_INIT_TIMEOUT then parseInt(process.env.HUBOT_SENTIMENT_BRAIN_INIT_TIMEOUT) else 10000)
 
-start = (robot) ->
+module.exports = (robot) ->
   # helper method to get the week of the year in numeric form
   getWeekOfYear = (dateObj = new Date()) ->
     onejan = new Date(dateObj.getFullYear(), 0, 1)
@@ -73,7 +72,7 @@ start = (robot) ->
   #      score: 0
   #    }]
   getAllEntriesForWeek = (recordType, weekNum) ->
-    (robot.brain[calculateKey(recordType, weekNum)] || {}).data || []
+    (robot.brain.get(calculateKey(recordType, weekNum)) || {}).entry_data || []
 
 
   # Description: returns keys
@@ -93,7 +92,7 @@ start = (robot) ->
   #  weekNum 0-52
   #  sentimentScore: AFINN Sentiment score
   updateEntry = (recordType, recordName, weekNum, sentimentScore) ->
-    masterRecord = (robot.brain[calculateKey(recordType, weekNum)] || {}).data || []
+    masterRecord = (robot.brain.get(calculateKey(recordType, weekNum)) || {}).entry_data || []
     entry = (_.filter(masterRecord, (x) -> x.name == recordName) || [])[0]
 
     if !entry || !entry.name
@@ -110,7 +109,7 @@ start = (robot) ->
     entry.score_average = ((entry.score_average * entry.score_count) + sentimentScore) / (entry.score_count + 1)
     entry.score_count = entry.score_count + 1
 
-    robot.brain[calculateKey(recordType, weekNum)] = {data: masterRecord}
+    robot.brain.set(calculateKey(recordType, weekNum), {entry_data: masterRecord})
 
   # helper method to get sender of the message
   getUsername = (response) ->
@@ -181,32 +180,26 @@ start = (robot) ->
   robot.respond /sentiment/i, (msg) ->
     msg.send getHappyPeople(3) + getHappyChannels(3) + getSadPeople(3) + getSadChannels(3)
 
-  robot.respond /who( i|')s happy\??/i, (msg) ->
+  robot.respond /who[ is']* happy\??/i, (msg) ->
     # responds in the current channel
     msg.send getHappyPeople(10)
 
-  robot.respond /where( i|')s( the)? (happy|happiness)\??/i, (msg) ->
+  robot.respond /where[ is']*( the)? (happy|happiness)\??/i, (msg) ->
     # responds in the current channel
     msg.send getHappyChannels(10)
 
-  robot.respond /who( i|')s (sad|stress(ed)?)\??/i, (msg) ->
+  robot.respond /who[ is']* (sad|stress(ed)?)\??/i, (msg) ->
     # responds in the current channel
     msg.send getSadPeople(10)
 
-  robot.respond /where( i|')s( the)? (sadness|stress)\??/i, (msg) ->
+  robot.respond /where[ is']*( the)? (sadness|stress)\??/i, (msg) ->
     # responds in the current channel
     msg.send getSadChannels(10)
 
-module.exports = (robot) ->
-  loaded = _.once(->
-    console.log "starting hubot-sentiment..."
-    start robot
-    return
-  )
-  if _.isEmpty(robot.brain.data) or _.isEmpty(robot.brain.data._private)
-    robot.brain.once "loaded", loaded
-    setTimeout loaded, INIT_TIMEOUT
-  else
-    loaded()
-  return
+  robot.respond /what[ is'] (sadness|stress)\??/i, (msg) ->
+    # responds in the current channel
+    msg.reply "Stress is not shipping code!"
 
+  robot.respond /what[ is'] (happiness|happy)\??/i, (msg) ->
+    # responds in the current channel
+    msg.reply "Happiness at Monsoon!"
