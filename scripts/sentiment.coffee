@@ -155,8 +155,8 @@ module.exports = (robot) ->
   sadChannelPrompt = "\n" + "Top stressed channels:\n"
 
   happyPeopleMessage = " - Nobody... Yet.\n"
-  happyChannelMessage = " - People need more hugs.\n"
-  sadPeopleMessage = " - Nowhere... Yet.\n"
+  happyChannelMessage = " - Nowhere... Yet.\n"
+  sadPeopleMessage = " - Nobody seems stressed!\n"
   sadChannelMessage = " - Everything is dandy!\n"
 
   robot.respond /sentiment/i, (msg) ->
