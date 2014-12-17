@@ -145,17 +145,17 @@ module.exports = (robot) ->
 
   robot.respond /who( i|')s happy\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top happy people:\n" + (prettyPrintList || "Nobody... :(\n") onlyPositive getTopForWeek('descending', 10, 'user', getWeekOfYear())
+    msg.send "Top happy people:\n" + prettyPrintList (onlyPositive || "Nobody... :(\n") getTopForWeek('descending', 10, 'user', getWeekOfYear())
 
   robot.respond /who( i|')s (sad|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top stressed people:\n" + (prettyPrintList || "Nobody! :)\n") onlyNegative getTopForWeek('ascending', 10, 'user', getWeekOfYear())
+    msg.send "Top stressed people:\n" + prettyPrintList (onlyNegative || "Nobody! :)\n") getTopForWeek('ascending', 10, 'user', getWeekOfYear())
 
   robot.respond /where( i|')s( the)? happiness\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top happy channels:\n" + (prettyPrintList || "People need more hugs.\n") onlyPositive getTopForWeek('descending', 10, 'channel', getWeekOfYear())
+    msg.send "Top happy channels:\n" + prettyPrintList (onlyPositive || "People need more hugs.\n") getTopForWeek('descending', 10, 'channel', getWeekOfYear())
 
   robot.respond /where( i|')s( the)? (sad|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top stressed channels:\n" +  (prettyPrintList || "Everything is dandy!\n") onlyNegative getTopForWeek('ascending', 10, 'channel', getWeekOfYear())
+    msg.send "Top stressed channels:\n" +  prettyPrintList (onlyNegative || "Everything is dandy!\n") getTopForWeek('ascending', 10, 'channel', getWeekOfYear())
 
