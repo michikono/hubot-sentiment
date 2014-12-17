@@ -13,11 +13,13 @@ Copy `scripts/sentiment-test.coffee` to your slack bot's `scripts/` folder.
 
 # To use
 
-* PM the bot `sentiment`
-* `[botname] sentiment`
+1. Invite the bot to rooms 
+2. Let people chat
+3. PM the bot: `sentiment` or publicly message: `[botname] sentiment`
 
 # Note
 
+* Scores reset weekly
 * The bot does not log chats
 * The bot needs brain to work (https://github.com/github/hubot/blob/master/src/brain.coffee)
 * The bot uses slack's RTM API so older versions of hubot-slack will NOT work with this bot
