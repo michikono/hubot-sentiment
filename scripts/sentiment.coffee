@@ -145,7 +145,7 @@ module.exports = (robot) ->
 
   robot.hear /.*/, (msg)->
     # match everything and log it
-    if(!msg.message.text.match(/(who|where)( i|')s( the)? (happy|sad|sadness|stress|stressed|happiness)\??/i))
+    if(!msg.message.text.match(/(who|where)( i|')s( the)? (happy|sad|sadness|stress|stressed|happiness|mad|angry|anger)\??/i))
       logSentiment(msg)
 
   happyPeoplePrompt = "Top happy people:\n"
