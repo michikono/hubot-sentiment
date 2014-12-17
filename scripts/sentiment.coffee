@@ -2,6 +2,7 @@
 #   This bot measures sentiment in all channels its in and tracks analytics
 #
 # Commands:
+#   sentiment - lists sentiment stats (message contents NOT stored)
 #   who's happy?
 #   who's stressed?
 #   where's the happiness?
