@@ -162,33 +162,34 @@ module.exports = (robot) ->
   sadPeopleMessage = " - Nobody seems stressed!\n"
   sadChannelMessage = " - Everything is dandy!\n"
 
-  robot.respond /sentiment/i, (msg) ->
-    msg.send happyPeoplePrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 3, 'user', getWeekOfYear())),
-      happyPeopleMessage) +
-      happyChannelPrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 3, 'channel', getWeekOfYear())),
-      happyChannelMessage) +
-      sadPeoplePrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 3, 'user', getWeekOfYear())),
-      sadPeopleMessage) +
-      sadChannelPrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 3, 'channel', getWeekOfYear())),
+  getHappyPeople = (howMany) ->
+    happyPeoplePrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', howMany, 'user', getWeekOfYear())),
+      happyPeopleMessage)
+  getHappyChannels = (howMany) ->
+    happyChannelPrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', howMany, 'channel', getWeekOfYear())),
+      happyChannelMessage)
+  getSadPeople = (howMany) ->
+    sadPeoplePrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', howMany, 'user', getWeekOfYear())),
+      sadPeopleMessage)
+  getSadChannels = (howMany) ->
+    sadChannelPrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', howMany, 'channel', getWeekOfYear())),
       sadChannelMessage)
+
+  robot.respond /sentiment/i, (msg) ->
+    msg.send getHappyPeople(3) + getHappyChannels(3) + getSadPeople(3) + getSadChannels(3)
 
   robot.respond /who( i|')s happy\??/i, (msg) ->
     # responds in the current channel
-    msg.send happyPeoplePrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 10, 'user', getWeekOfYear())),
-      happyPeopleMessage)
+    msg.send getHappyPeople(10)
 
   robot.respond /where( i|')s( the)? (happy|happiness)\??/i, (msg) ->
     # responds in the current channel
-    msg.send happyChannelPrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 10, 'channel',
-      getWeekOfYear())), happyChannelMessage)
+    msg.send getHappyChannels(10)
 
   robot.respond /who( i|')s (sad|stress(ed)?)\??/i, (msg) ->
     # responds in the current channel
-    msg.send sadPeoplePrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 10, 'user', getWeekOfYear())),
-      sadPeopleMessage)
+    msg.send getSadPeople(10)
 
   robot.respond /where( i|')s( the)? (sadness|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.send sadChannelPrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 10, 'channel',
-      getWeekOfYear())), sadChannelMessage)
-
+    msg.send getSadChannels(10)
