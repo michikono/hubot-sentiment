@@ -126,7 +126,7 @@ module.exports = (robot) ->
   logSentiment = (response) ->
     # filter out slack emotes to their actual words
     analysis = sentiment response.message.text.replace(/:(.*?)[_.\-](.*?):/g, ' $1 $2 ')
-    if response.message.text && analysis && analysis.score #&& !isPrivateMessage(response)
+    if response.message.text && analysis && analysis.score && !isPrivateMessage(response)
       updateEntry('user', getUsername(response), getWeekOfYear(), analysis.score)
       updateEntry('channel', getChannel(response), getWeekOfYear(), analysis.score)
 
