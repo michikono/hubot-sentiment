@@ -1,5 +1,5 @@
 # Description:
-#   This bot measures sentiment in all channels its in and tracks analytics
+#   This bot measures sentiment in all channels its in and tracks analytics; starts are reset each week
 #
 # Commands:
 #   sentiment - lists sentiment stats (message contents NOT stored)
@@ -10,8 +10,11 @@
 #
 # Author:
 #   Michi Kono
+#   Will Barksdale
 #
-# Notes
+# Notes:
+#   Requires underscore and sentiment NPM modules
+#
 #   Tracks scores by current month. Collects sentiment on users [sentiment:week_digit:user] and
 #   channels [sentiment:week_digit:channel] in format:
 #
