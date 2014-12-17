@@ -130,7 +130,7 @@ module.exports = (robot) ->
     entries = entries || []
     if entries.length
       for entry, i in entries
-        output += "#{i+1}: #{entry.name} (#{entry.average_score})\n"
+        output += "#{i+1}: #{entry.name} (#{entry.score_average})\n"
     output
 
   onlyNegative = (list) ->
