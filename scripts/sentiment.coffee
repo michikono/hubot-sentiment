@@ -66,7 +66,6 @@ module.exports = (robot) ->
   #      score: 0
   #    }]
   getAllEntriesForWeek = (recordType, weekNum) ->
-    console.log(calculateKey(recordType, weekNum))
     (robot.brain[calculateKey(recordType, weekNum)] || {}).data || []
 
 
@@ -76,7 +75,7 @@ module.exports = (robot) ->
   #   recordName: channel_name or user_name
   #   weekNum: 0-52
   #
-  calculateKey  = (recordType, weekNum) ->
+  calculateKey = (recordType, weekNum) ->
     "sentiment:#{weekNum}:#{recordType}"
 
   # Description:
@@ -107,15 +106,18 @@ module.exports = (robot) ->
     robot.brain[calculateKey(recordType, weekNum)] = {data: masterRecord}
 
   # helper method to get sender of the message
-  get_username = (response) ->
+  getUsername = (response) ->
     "@#{response.message.user.name}"
 
   # helper method to get channel of originating message
-  get_channel = (response) ->
+  getChannel = (response) ->
     if response.message.room == response.message.user.name
       "@#{response.message.room}"
     else
       "##{response.message.room}"
+
+  isPrivateMessage = (response) ->
+    return getUsername(response) == getChannel(response)
 
   # update sentiment of a record
   # Params:
@@ -123,15 +125,16 @@ module.exports = (robot) ->
   logSentiment = (response) ->
     analysis = sentiment(response.message.text)
     if(response.message.text.length > 2 && analysis && analysis.score)
-      updateEntry('user', get_username(response), getWeekOfYear(), analysis.score)
-      updateEntry('channel', get_channel(response), getWeekOfYear(), analysis.score)
+      updateEntry('user', getUsername(response), getWeekOfYear(), analysis.score)
+      if !isPrivateMessage(response)
+        updateEntry('channel', getChannel(response), getWeekOfYear(), analysis.score)
 
   prettyPrintList = (entries, emptyMessage) ->
     output = ''
     entries = entries || []
     if entries.length
       for entry, i in entries
-        output += "#{i+1}: #{entry.name}\n"
+        output += "#{i + 1}: #{entry.name}\n"
     output || emptyMessage
 
   onlyNegative = (list) ->
@@ -142,22 +145,46 @@ module.exports = (robot) ->
 
   robot.hear /.*/, (msg)->
     # match everything and log it
-    if(!msg.message.text.match(/(who|where)( i|')s( the)? (happy|sad|stress|stressed|happiness)\??/i))
+    if(!msg.message.text.match(/(who|where)( i|')s( the)? (happy|sad|sadness|stress|stressed|happiness)\??/i))
       logSentiment(msg)
+
+  happyPeoplePrompt = "Top happy people:\n"
+  happyChannelPrompt = "\n" + "Top happy channels:\n"
+  sadPeoplePrompt = "\n" + "Top stressed people:\n"
+  sadChannelPrompt = "\n" + "Top stressed channels:\n"
+
+  happyPeopleMessage = " - Nobody... Yet.\n"
+  happyChannelMessage = " - People need more hugs.\n"
+  sadPeopleMessage = " - Nowhere... Yet.\n"
+  sadChannelMessage = " - Everything is dandy!\n"
+
+  robot.respond /sentiment/i, (msg) ->
+    msg.send happyPeoplePrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 3, 'user', getWeekOfYear())),
+      happyPeopleMessage) +
+      happyChannelPrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 3, 'channel', getWeekOfYear())),
+      happyChannelMessage) +
+      sadPeoplePrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 3, 'user', getWeekOfYear())),
+      sadPeopleMessage) +
+      sadChannelPrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 3, 'channel', getWeekOfYear())),
+      sadChannelMessage)
 
   robot.respond /who( i|')s happy\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top happy people:\n" + prettyPrintList(onlyPositive(getTopForWeek('descending', 10, 'user', getWeekOfYear())), "Nobody... :(\n")
+    msg.send happyPeoplePrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 10, 'user', getWeekOfYear())),
+      happyPeopleMessage)
 
-  robot.respond /who( i|')s (sad|stress)\??/i, (msg) ->
+  robot.respond /where( i|')s( the)? (happy|happiness)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top stressed people:\n" + prettyPrintList(onlyNegative(getTopForWeek('ascending', 10, 'user', getWeekOfYear())), "Nobody! :)\n")
+    msg.send happyChannelPrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', 10, 'channel',
+      getWeekOfYear())), happyChannelMessage)
 
-  robot.respond /where( i|')s( the)? happiness\??/i, (msg) ->
+  robot.respond /who( i|')s (sad|stress(ed)?)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top happy channels:\n" + prettyPrintList(onlyPositive(getTopForWeek('descending', 10, 'channel', getWeekOfYear())), "People need more hugs.\n")
+    msg.send sadPeoplePrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 10, 'user', getWeekOfYear())),
+      sadPeopleMessage)
 
-  robot.respond /where( i|')s( the)? (sad|stress)\??/i, (msg) ->
+  robot.respond /where( i|')s( the)? (sadness|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top stressed channels:\n" +  prettyPrintList(onlyNegative(getTopForWeek('ascending', 10, 'channel', getWeekOfYear())), "Everything is dandy!\n")
+    msg.send sadChannelPrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', 10, 'channel',
+      getWeekOfYear())), sadChannelMessage)
 
