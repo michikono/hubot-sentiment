@@ -12,6 +12,8 @@
 #   Michi Kono
 #   Will Barksdale
 #
+# Configuration:
+#   HUBOT_SENTIMENT_BRAIN_INIT_TIMEOUT=N - wait for N milliseconds for brain data to load from redis. (default 10000)
 # Notes:
 #   Requires underscore and sentiment NPM modules
 #
@@ -31,8 +33,9 @@
 #
 sentiment = require 'sentiment'
 _ = require 'underscore'
+INIT_TIMEOUT = (if process.env.HUBOT_REACT_INIT_TIMEOUT then parseInt(process.env.HUBOT_SENTIMENT_BRAIN_INIT_TIMEOUT) else 10000)
 
-module.exports = (robot) ->
+start = (robot) ->
   # helper method to get the week of the year in numeric form
   getWeekOfYear = (dateObj = new Date()) ->
     onejan = new Date(dateObj.getFullYear(), 0, 1)
@@ -193,3 +196,17 @@ module.exports = (robot) ->
   robot.respond /where( i|')s( the)? (sadness|stress)\??/i, (msg) ->
     # responds in the current channel
     msg.send getSadChannels(10)
+
+module.exports = (robot) ->
+  loaded = _.once(->
+    console.log "starting hubot-sentiment..."
+    start robot
+    return
+  )
+  if _.isEmpty(robot.brain.data) or _.isEmpty(robot.brain.data._private)
+    robot.brain.once "loaded", loaded
+    setTimeout loaded, INIT_TIMEOUT
+  else
+    loaded()
+  return
+
