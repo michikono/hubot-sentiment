@@ -122,7 +122,6 @@ module.exports = (robot) ->
   logSentiment = (response) ->
     analysis = sentiment(response.message.text)
     if(response.message.text.length > 2 && analysis && analysis.score)
-      console.log("logged score #{analysis.score} for #{response.message.text}")
       updateEntry('user', get_username(response), getWeekOfYear(), analysis.score)
       updateEntry('channel', get_channel(response), getWeekOfYear(), analysis.score)
 
