@@ -2,10 +2,9 @@
   "name": "hubot-sentiment",
   "version": "1.0.0",
   "author": "Michi Kono <michikono@gmail.com>",
-  "contributors": [{
-    "name": "Will Barksdale",
-    "email": "wfbarksdale@gmail.com"
-  }],
+  "contributors": [
+    "Will Barksdale <wfbarksdale@gmail.com>"
+  ],
   "description": "Sentiment analysis for hubot",
   "keywords": [
     "hubot",
@@ -13,6 +12,7 @@
     "sentiment"
   ],
   "dependencies": {
+    "coffee-script": "~1.6",
     "sentiment": "^1.0.2",
     "underscore": "^1.7.0"
   },
@@ -21,7 +21,6 @@
   },
   "main": "index.coffee",
   "devDependencies": {
-    "coffee-script": "~1.6",
     "mocha": "*",
     "chai": "*",
     "sinon-chai": "*",
@@ -32,7 +31,8 @@
     "grunt-contrib-watch": "~0.5.3"
   },
   "scripts": {
-    "test": "grunt test"
+    "bootstrap": "./script/bootstrap",
+    "test": "./script/test"
   },
   "repository": {
     "type": "git",
@@ -42,5 +42,8 @@
   "bugs": {
     "url": "https://github.com/michikono/hubot-sentiment/issues"
   },
-  "homepage": "https://github.com/michikono/hubot-sentiment"
+  "homepage": "https://github.com/michikono/hubot-sentiment",
+  "directories": {
+    "test": "test"
+  }
 }

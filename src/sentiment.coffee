@@ -29,8 +29,8 @@
 #   [sentiment:12:user:michi] = {n:a:yyyy} where n is the number of records, and a is the average score of the n records
 #   To add a new score: (n + 1), ((a * n) + 2.5 / (n+1)) => new averages
 #
-sentiment = require('sentiment')
-_ = require('underscore')
+sentiment = require 'sentiment'
+_ = require 'underscore'
 
 module.exports = (robot) ->
   # helper method to get the week of the year in numeric form
