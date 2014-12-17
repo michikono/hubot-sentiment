@@ -10,7 +10,7 @@ describe 'sentiment', ->
       respond: sinon.spy()
       hear: sinon.spy()
 
-    require('../src/scripts/sentiment')(@robot)
+    require('../src/sentiment')(@robot)
 
   it 'compiles', ->
     true
