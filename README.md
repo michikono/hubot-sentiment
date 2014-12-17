@@ -9,7 +9,7 @@ Go to your bot's root directory and run:
     npm install sentiment --save
     npm install underscore --save
 
-Copy `scripts/sentiment.coffee` to your slack bot's `scripts/` folder.
+Copy `scripts/sentiment-test.coffee` to your slack bot's `scripts/` folder.
 
 # To use
 
