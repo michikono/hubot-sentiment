@@ -127,9 +127,20 @@ module.exports = (robot) ->
 
   prettyPrintList = (entries) ->
     output = ''
-    for entry, i in entries
-      output += "#{entry.name}\n"
+    entries = entries || []
+    if entries.length
+      for entry, i in entries
+        output += "#{i+1}: #{entry.name}\n"
+    else
+      output = 'nobody! yay?'
+
     output
+
+  onlyNegative = (list) ->
+    _.filter(list || [], (x) -> x.score_average > 0)
+
+  onlyPositive = (list) ->
+    _.filter(list || [], (x) -> x.score_average < 0)
 
   robot.hear /.*/, (msg)->
     # match everything and log it
@@ -137,17 +148,17 @@ module.exports = (robot) ->
 
   robot.respond /who( i|')s happy\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top happy people:\n" + prettyPrintList getTopForWeek('descending', 10, 'user', getWeekOfYear())
+    msg.send "Top happy people:\n" + prettyPrintList onlyPositive getTopForWeek('descending', 10, 'user', getWeekOfYear())
 
-  robot.respond /who( i|')s stressed\??/i, (msg) ->
+  robot.respond /who( i|')s (sad|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top stressed people:\n" + prettyPrintList getTopForWeek('ascending', 10, 'user', getWeekOfYear())
+    msg.send "Top stressed people:\n" + prettyPrintList onlyNegative getTopForWeek('ascending', 10, 'user', getWeekOfYear())
 
-  robot.respond /where( i|')s the happiness\??/i, (msg) ->
+  robot.respond /where( i|')s( the)? happiness\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top happy channels:\n" + prettyPrintList getTopForWeek('descending', 10, 'channel', getWeekOfYear())
+    msg.send "Top happy channels:\n" + prettyPrintList onlyPositive getTopForWeek('descending', 10, 'channel', getWeekOfYear())
 
-  robot.respond /where( i|')s the stress\??/i, (msg) ->
+  robot.respond /where( i|')s( the)? (sad|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.send "Top stressed channels:\n" +  prettyPrintList getTopForWeek('ascending', 10, 'channel', getWeekOfYear())
+    msg.send "Top stressed channels:\n" +  prettyPrintList onlyNegative getTopForWeek('ascending', 10, 'channel', getWeekOfYear())
 
