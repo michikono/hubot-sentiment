@@ -124,11 +124,11 @@ module.exports = (robot) ->
   # Params:
   #   Response
   logSentiment = (response) ->
-    analysis = sentiment(response.message.text)
-    if(response.message.text.length > 2 && analysis && analysis.score)
-      if !isPrivateMessage(response)
-        updateEntry('user', getUsername(response), getWeekOfYear(), analysis.score)
-        updateEntry('channel', getChannel(response), getWeekOfYear(), analysis.score)
+    # filter out slack emotes to their actual words
+    analysis = sentiment response.message.text.replace(/:(.*?)[_.\-](.*?):/g, ' $1 $2 ')
+    if response.message.text && analysis && analysis.score #&& !isPrivateMessage(response)
+      updateEntry('user', getUsername(response), getWeekOfYear(), analysis.score)
+      updateEntry('channel', getChannel(response), getWeekOfYear(), analysis.score)
 
   prettyPrintList = (entries, emptyMessage) ->
     output = ''
