@@ -4,7 +4,7 @@
 #
 # Commands:
 #   [bot name] sentiment - lists sentiment stats (message contents NOT stored)
-#   [bot name] how are things? - just details about the current channel + you
+#   [bot name] how am i? - just details about the current channel + you
 #   [bot name] who's happy?
 #   [bot name] who's stressed?
 #   [bot name] where's happiness?
@@ -152,7 +152,7 @@ module.exports = (robot) ->
     return ":-D" if(score >= 2.5)
     return "8-)" if(score >= 1.5)
     return ":-)" if(score >= 0.1)
-    return "THERE IS INSUFFICIENT DATA FOR A MEANINGFUL ANSWER."
+    return "._."
 
   prettyPrintList = (entries, emptyMessage) ->
     output = ''
@@ -213,7 +213,7 @@ module.exports = (robot) ->
     generalChannelPrompt + prettyPrintList( [getRecord('channel', where, getWeekOfYear())], generalChannelMessage)
 
 
-  robot.respond /how are things\??/i, (msg) ->
+  robot.respond /how am I\??/i, (msg) ->
     msg.send getMyStats(getUsername(msg)) + getChannelStats(getUsername(msg))
 
   robot.respond /sentiment/i, (msg) ->
