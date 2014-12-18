@@ -6,10 +6,14 @@ A hubot-slack (v3.0+) script that runs sentiment analysis of chatrooms its in.
 
 Go to your bot's root directory and run:
 
-    npm install sentiment --save
-    npm install underscore --save
+    npm install hubot-sentiment --save
+    
+Add it to your `external-scripts.json`: 
 
-Copy `scripts/sentiment-test.coffee` to your slack bot's `scripts/` folder.
+    [
+      "hubot-sentiment"
+    ]
+
 
 # To use
 
