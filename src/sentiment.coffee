@@ -199,8 +199,8 @@ module.exports = (robot) ->
 
   robot.respond /what[ is']* (sadness|stress)\??/i, (msg) ->
     # responds in the current channel
-    msg.reply "Stress is not shipping code!"
+    msg.reply "Stress is too many meetings!"
 
   robot.respond /what[ is']* (happiness|happy)\??/i, (msg) ->
     # responds in the current channel
-    msg.reply "Happiness at Monsoon!"
+    msg.reply "Happiness is shipping code!"
