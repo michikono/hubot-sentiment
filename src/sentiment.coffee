@@ -57,9 +57,11 @@ module.exports = (robot) ->
   #      score: 0
   #    }]
   getTopForWeek = (ordering, topNumber, topType, weekNum) ->
-    _.sortBy(getAllEntriesForWeek(topType, weekNum), (entry) ->
-      (if ordering == 'ascending' then -1 else 1) * entry.score
-    ).slice(0, topNumber)
+    sorted = _.sortBy(getAllEntriesForWeek(topType, weekNum), (entry) ->
+      entry.score
+    )
+    sorted.reverse() if ordering == 'descending'
+    sorted.slice(0, topNumber)
 
   # Description:
   #  Gets all of the records of type recordType from weekNum
