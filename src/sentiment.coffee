@@ -198,10 +198,10 @@ module.exports = (robot) ->
     # responds in the current channel
     msg.send getSadChannels(10)
 
-  robot.respond /what[ is'] (sadness|stress)\??/i, (msg) ->
+  robot.respond /what[ is']* (sadness|stress)\??/i, (msg) ->
     # responds in the current channel
     msg.reply "Stress is not shipping code!"
 
-  robot.respond /what[ is'] (happiness|happy)\??/i, (msg) ->
+  robot.respond /what[ is']* (happiness|happy)\??/i, (msg) ->
     # responds in the current channel
     msg.reply "Happiness at Monsoon!"
