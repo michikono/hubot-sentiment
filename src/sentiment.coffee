@@ -140,7 +140,8 @@ module.exports = (robot) ->
     entries = entries || []
     if entries.length
       for entry, i in entries
-        output += "#{i + 1}: #{entry.name}\n"
+        # remove @ from @names to prevent notification spam
+        output += "#{i + 1}: #{entry.name.replace(/@/g, '')}\n"
     output || emptyMessage
 
   onlyNegative = (list) ->
