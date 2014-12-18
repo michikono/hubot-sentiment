@@ -3,12 +3,12 @@
 #   All bot commands can be sent via PM as well.
 #
 # Commands:
-#   [bot name] sentiment - lists sentiment stats (message contents NOT stored)
-#   [bot name] how am i? - just details about the current channel + you
-#   [bot name] who's happy?
-#   [bot name] who's stressed?
-#   [bot name] where's happiness?
-#   [bot name] where's stress?
+#   [bot name] sentiment - lists sentiment stats
+#   [bot name] how am i? - details about the current channel + you
+#   [bot name] who's happy? - who's happiest?
+#   [bot name] who's stressed? - who's stressed out?
+#   [bot name] where's happiness? - which rooms are happiest?
+#   [bot name] where's stress? - which rooms are stressed out?
 #
 # Author:
 #   Michi Kono
