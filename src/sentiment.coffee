@@ -214,7 +214,7 @@ module.exports = (robot) ->
 
 
   robot.respond /how am I\??/i, (msg) ->
-    msg.send getMyStats(getUsername(msg)) + getChannelStats(getUsername(msg))
+    msg.send getMyStats(getUsername(msg)) + getChannelStats(getChannel(msg))
 
   robot.respond /sentiment/i, (msg) ->
     msg.send getHappyPeople(3) + getHappyChannels(3) + getSadPeople(3) + getSadChannels(3)
