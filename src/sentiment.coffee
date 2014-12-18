@@ -3,6 +3,7 @@
 #
 # Commands:
 #   sentiment - lists sentiment stats (message contents NOT stored)
+#   how are things? - just details about the current channel + you
 #   who's happy?
 #   who's stressed?
 #   where's happiness?
@@ -72,7 +73,7 @@ module.exports = (robot) ->
   #      score: 0
   #    }]
   getAllEntriesForWeek = (recordType, weekNum) ->
-    (robot.brain.get(calculateKey(recordType, weekNum)) || {}).entry_data || []
+    getMasterRecord(recordType, recordName, weekNum)
 
 
   # Description: returns keys
@@ -84,6 +85,12 @@ module.exports = (robot) ->
   calculateKey = (recordType, weekNum) ->
     "sentiment:#{weekNum}:#{recordType}"
 
+  getMasterRecord = (recordType, recordName, weekNum) ->
+    (robot.brain.get(calculateKey(recordType, weekNum)) || {}).entry_data || []
+
+  getRecord = (recordType, recordName, weekNum) ->
+    (_.filter(getMasterRecord(recordType, recordName, weekNum), (x) -> x.name == recordName) || [])[0]
+
   # Description:
   #  Updates the record with the value of sentimentScore
   # Params:
@@ -92,8 +99,8 @@ module.exports = (robot) ->
   #  weekNum 0-52
   #  sentimentScore: AFINN Sentiment score
   updateEntry = (recordType, recordName, weekNum, sentimentScore) ->
-    masterRecord = (robot.brain.get(calculateKey(recordType, weekNum)) || {}).entry_data || []
-    entry = (_.filter(masterRecord, (x) -> x.name == recordName) || [])[0]
+    masterRecord = getMasterRecord(recordType, recordName, weekNum)
+    entry = getRecord(recordType, recordName, weekNum)
 
     if !entry || !entry.name
       entry =
@@ -135,13 +142,28 @@ module.exports = (robot) ->
       updateEntry('user', getUsername(response), getWeekOfYear(), analysis.score)
       updateEntry('channel', getChannel(response), getWeekOfYear(), analysis.score)
 
+  emoteScore = (score) ->
+    score = parseFloat(score)
+    return ":'("  if(score <= -3)
+    return ":-((((" if(score <= -2)
+    return ":-(" if(score <= -1)
+    return ":-/" if(score <= -0.1)
+    return ":-D!!!" if(score >= 3)
+    return ":-D" if(score >= 2)
+    return "8-)" if(score >= 1)
+    return ":-)" if(score >= 0.1)
+    return "THERE IS INSUFFICIENT DATA FOR A MEANINGFUL ANSWER."
+
   prettyPrintList = (entries, emptyMessage) ->
     output = ''
     entries = entries || []
     if entries.length
       for entry, i in entries
         # remove @ from @names to prevent notification spam
-        output += "#{i + 1}: #{entry.name.replace(/@/g, '')}\n"
+        if entries.length <= 1
+          output += "#{entry.name.replace(/@/g, '')} = #{emoteScore(parseFloat(entry.score_average))}\n"
+        else
+          output += "#{i + 1}: #{entry.name.replace(/@/g, '')} = #{emoteScore(parseFloat(entry.score_average))}\n"
     output || emptyMessage
 
   onlyNegative = (list) ->
@@ -156,14 +178,20 @@ module.exports = (robot) ->
       logSentiment(msg)
 
   happyPeoplePrompt = "Top happy people:\n"
-  happyChannelPrompt = "\n" + "Top happy channels:\n"
-  sadPeoplePrompt = "\n" + "Top stressed people:\n"
-  sadChannelPrompt = "\n" + "Top stressed channels:\n"
+  happyChannelPrompt = "Top happy channels:\n"
+  sadPeoplePrompt = "Top stressed people:\n"
+  sadChannelPrompt = "Top stressed channels:\n"
+
+  generalPersonalPrompt = "You: "
+  generalChannelPrompt = "This channel: "
 
   happyPeopleMessage = " - Nobody... Yet.\n"
   happyChannelMessage = " - Nowhere... Yet.\n"
   sadPeopleMessage = " - Nobody seems stressed!\n"
   sadChannelMessage = " - Everything is dandy!\n"
+
+  generalStatusMessage = "THERE IS INSUFFICIENT DATA FOR A MEANINGFUL ANSWER.\n"
+  generalChannelMessage = "THERE IS INSUFFICIENT DATA FOR A MEANINGFUL ANSWER.\n"
 
   getHappyPeople = (howMany) ->
     happyPeoplePrompt + prettyPrintList(onlyPositive(getTopForWeek('descending', howMany, 'user', getWeekOfYear())),
@@ -178,8 +206,18 @@ module.exports = (robot) ->
     sadChannelPrompt + prettyPrintList(onlyNegative(getTopForWeek('ascending', howMany, 'channel', getWeekOfYear())),
       sadChannelMessage)
 
+  getMyStats = (who) ->
+    generalPersonalPrompt + prettyPrintList( [getRecord('user', who, getWeekOfYear())], generalStatusMessage)
+
+  getChannelStats = (where) ->
+    generalChannelPrompt + prettyPrintList( [getRecord('channel', where, getWeekOfYear())], generalChannelMessage)
+
+
+  robot.respond /how are things\??/i, (msg) ->
+    msg.send getMyStats(getUsername(msg)) + "\n" + getChannelStats(getUsername(msg))
+
   robot.respond /sentiment/i, (msg) ->
-    msg.send getHappyPeople(3) + getHappyChannels(3) + getSadPeople(3) + getSadChannels(3)
+    msg.send getHappyPeople(3) + "\n" + getHappyChannels(3) + "\n" + getSadPeople(3) + "\n" + getSadChannels(3)
 
   robot.respond /who[ is']* happy\??/i, (msg) ->
     # responds in the current channel
