@@ -73,8 +73,7 @@ module.exports = (robot) ->
   #      score: 0
   #    }]
   getAllEntriesForWeek = (recordType, weekNum) ->
-    getMasterRecord(recordType, recordName, weekNum)
-
+    (robot.brain.get(calculateKey(recordType, weekNum)) || {}).entry_data || []
 
   # Description: returns keys
   #  Params:
