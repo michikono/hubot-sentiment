@@ -145,10 +145,10 @@ module.exports = (robot) ->
     output || emptyMessage
 
   onlyNegative = (list) ->
-    _.filter(list || [], (x) -> (parseFloat(x.score_average) <= 0))
+    _.filter(list || [], (x) -> parseFloat(x.score_average) <= 0)
 
   onlyPositive = (list) ->
-    _.filter(list || [], (x) -> parseFloat((x.score_average) > 0))
+    _.filter(list || [], (x) -> parseFloat(x.score_average) > 0)
 
   robot.hear /.*/, (msg)->
     # match everything and log it
