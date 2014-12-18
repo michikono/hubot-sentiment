@@ -1,13 +1,14 @@
 # Description:
-#   This bot measures sentiment in all channels its in and tracks analytics; starts are reset each week
+#   This bot measures sentiment in all channels its in and tracks analytics; starts are reset each week.
+#   All bot commands can be sent via PM as well.
 #
 # Commands:
-#   sentiment - lists sentiment stats (message contents NOT stored)
-#   how are things? - just details about the current channel + you
-#   who's happy?
-#   who's stressed?
-#   where's happiness?
-#   where's stress?
+#   [bot name] sentiment - lists sentiment stats (message contents NOT stored)
+#   [bot name] how are things? - just details about the current channel + you
+#   [bot name] who's happy?
+#   [bot name] who's stressed?
+#   [bot name] where's happiness?
+#   [bot name] where's stress?
 #
 # Author:
 #   Michi Kono
@@ -58,8 +59,8 @@ module.exports = (robot) ->
   #      score: 0
   #    }]
   getTopForWeek = (ordering, topNumber, topType, weekNum) ->
-    sorted = _.sortBy(getAllEntriesForWeek(topType, weekNum), (entry) -> parseFloat(entry.score))
-    sorted = sorted.reverse() if ordering == 'ascending'
+    sorted = _.sortBy(getAllEntriesForWeek(topType, weekNum), (entry) -> parseFloat(entry.score_average))
+    sorted = sorted.reverse() if ordering == 'descending'
     sorted.slice(0, topNumber)
 
   # Description:
@@ -143,27 +144,27 @@ module.exports = (robot) ->
 
   emoteScore = (score) ->
     score = parseFloat(score)
-    return ":'("  if(score <= -3)
-    return ":-((((" if(score <= -2)
-    return ":-(" if(score <= -1)
-    return ":-/" if(score <= -0.1)
-    return ":-D!!!" if(score >= 3)
-    return ":-D" if(score >= 2)
-    return "8-)" if(score >= 1)
+    return ":'("  if(score <= -3.5)
+    return ":-(" if(score <= -2.5)
+    return ":-/" if(score <= -1.5)
+    return ":-|" if(score <= -0.1)
+    return ":-D!!!" if(score >= 3.5)
+    return ":-D" if(score >= 2.5)
+    return "8-)" if(score >= 1.5)
     return ":-)" if(score >= 0.1)
     return "THERE IS INSUFFICIENT DATA FOR A MEANINGFUL ANSWER."
 
   prettyPrintList = (entries, emptyMessage) ->
     output = ''
-    entries = entries || []
-    if entries.length
+    if (entries || []).length
       for entry, i in entries
         # remove @ from @names to prevent notification spam
-        if entries.length <= 1
-          output += "#{entry.name.replace(/@/g, '')} = #{emoteScore(parseFloat(entry.score_average))}\n"
-        else
-          output += "#{i + 1}: #{entry.name.replace(/@/g, '')} = #{emoteScore(parseFloat(entry.score_average))}\n"
-    output || emptyMessage
+        if(entry)
+          if entries.length <= 1
+            output += " #{entry.name.replace(/[@\n\r]/g, '')} = #{emoteScore(parseFloat(entry.score_average))}\n"
+          else
+            output += " #{i + 1}: #{entry.name.replace(/[@\n\r]/g, '')} = #{emoteScore(parseFloat(entry.score_average))}\n"
+    (output || emptyMessage) + "\n"
 
   onlyNegative = (list) ->
     _.filter(list || [], (x) -> parseFloat(x.score_average) <= 0)
@@ -178,8 +179,8 @@ module.exports = (robot) ->
 
   happyPeoplePrompt = "Top happy people:\n"
   happyChannelPrompt = "Top happy channels:\n"
-  sadPeoplePrompt = "Top stressed people:\n"
-  sadChannelPrompt = "Top stressed channels:\n"
+  sadPeoplePrompt = "Most stressed people:\n"
+  sadChannelPrompt = "Most stressed channels:\n"
 
   generalPersonalPrompt = "You: "
   generalChannelPrompt = "This channel: "
@@ -213,10 +214,10 @@ module.exports = (robot) ->
 
 
   robot.respond /how are things\??/i, (msg) ->
-    msg.send getMyStats(getUsername(msg)) + "\n" + getChannelStats(getUsername(msg))
+    msg.send getMyStats(getUsername(msg)) + getChannelStats(getUsername(msg))
 
   robot.respond /sentiment/i, (msg) ->
-    msg.send getHappyPeople(3) + "\n" + getHappyChannels(3) + "\n" + getSadPeople(3) + "\n" + getSadChannels(3)
+    msg.send getHappyPeople(3) + getHappyChannels(3) + getSadPeople(3) + getSadChannels(3)
 
   robot.respond /who[ is']* happy\??/i, (msg) ->
     # responds in the current channel
