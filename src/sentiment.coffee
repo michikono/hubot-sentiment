@@ -57,8 +57,8 @@ module.exports = (robot) ->
   #      score: 0
   #    }]
   getTopForWeek = (ordering, topNumber, topType, weekNum) ->
-    sorted = _.sortBy(getAllEntriesForWeek(topType, weekNum), (entry) -> entry.score)
-    sorted = sorted.reverse() if ordering == 'descending'
+    sorted = _.sortBy(getAllEntriesForWeek(topType, weekNum), (entry) -> parseFloat(entry.score))
+    sorted = sorted.reverse() if ordering == 'ascending'
     sorted.slice(0, topNumber)
 
   # Description:
