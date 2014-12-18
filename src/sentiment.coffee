@@ -106,8 +106,8 @@ module.exports = (robot) ->
 
     entry.score_average = 0 if !entry.score_average
     entry.score_count = 0 if !entry.score_count
-    entry.score_average = ((entry.score_average * entry.score_count) + sentimentScore) / (entry.score_count + 1)
-    entry.score_count = entry.score_count + 1
+    entry.score_average = ((parseFloat(entry.score_average) * parseFloat(entry.score_count)) + sentimentScore) / parseFloat((entry.score_count) + 1)
+    entry.score_count = parseFloat(entry.score_count) + 1
 
     robot.brain.set(calculateKey(recordType, weekNum), {entry_data: masterRecord})
 
@@ -145,10 +145,10 @@ module.exports = (robot) ->
     output || emptyMessage
 
   onlyNegative = (list) ->
-    _.filter(list || [], (x) -> (x.score_average <= 0))
+    _.filter(list || [], (x) -> (parseFloat(x.score_average) <= 0))
 
   onlyPositive = (list) ->
-    _.filter(list || [], (x) -> (x.score_average > 0))
+    _.filter(list || [], (x) -> parseFloat((x.score_average) > 0))
 
   robot.hear /.*/, (msg)->
     # match everything and log it
